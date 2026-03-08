@@ -4,7 +4,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
-# Ensure required NLTK resources are available
+# Asegurar que los recursos de NLTK requeridos estén disponibles
 try:
     nltk.data.find('corpora/stopwords')
 except LookupError:
@@ -24,30 +24,30 @@ class TextPreprocessor:
         self.stop_words = set(stopwords.words('english'))
         
     def clean_html(self, raw_html):
-        """Strip HTML tags using BeautifulSoup."""
+        """Elimina las etiquetas HTML usando BeautifulSoup."""
         if not raw_html:
             return ""
         soup = BeautifulSoup(raw_html, "html.parser")
         return soup.get_text()
         
     def process(self, text):
-        """Standardize and tokenize email text for NLP."""
+        """Estandariza y tokeniza el texto del correo para NLP."""
         if not isinstance(text, str):
             return ""
         
-        # 1. Strip HTML
+        # 1. Eliminar HTML
         text = self.clean_html(text)
         
-        # 2. Lowercase
+        # 2. Minúsculas
         text = text.lower()
         
-        # 3. Remove punctuation and numbers
+        # 3. Eliminar puntuación y números
         text = re.sub(r'[^a-zA-Z\s]', '', text)
         
-        # 4. Tokenization (by whitespace)
+        # 4. Tokenización (por espacios en blanco)
         tokens = text.split()
         
-        # 5. Stop-word removal and Lemmatization
+        # 5. Eliminación de palabras vacías (stop-words) y Lematización
         cleaned_tokens = [
             self.lemmatizer.lemmatize(word) 
             for word in tokens 

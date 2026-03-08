@@ -13,7 +13,7 @@ class EmailLog(Base):
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     sender = Column(String, nullable=False)
     predicted_class = Column(Integer, nullable=False)
-    confidence_score = Column(Float, nullable=True) # Optional for now
+    confidence_score = Column(Float, nullable=True) # Opcional por ahora
     action_taken = Column(String, nullable=False)
 
     __table_args__ = (
