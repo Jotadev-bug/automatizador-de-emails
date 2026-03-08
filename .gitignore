@@ -1,0 +1,25 @@
+# Environments
+venv/
+env/
+.env
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data and ML Models
+data/*.csv
+data/*.pkl
+
+# Logs
+execution.log
+*.log
+
+# Databases (Future-proofing based on UPDATES.md)
+*.db
+*.sqlite3
+
+# OS generated files
+.DS_Store
+Thumbs.db
