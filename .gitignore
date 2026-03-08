@@ -17,8 +17,8 @@ execution.log
 *.log
 
 # Databases (Future-proofing based on UPDATES.md)
-*.db
 *.sqlite3
+data/logs.db
 
 # OS generated files
 .DS_Store

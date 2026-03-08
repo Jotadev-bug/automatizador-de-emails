@@ -7,6 +7,7 @@ import joblib
 
 from email_client import EmailClient
 from preprocessing import TextPreprocessor
+from database import init_db, EmailLog
 
 # Setup Logging
 logging.basicConfig(
@@ -43,6 +44,7 @@ class EmailDaemon:
             
         self.client = EmailClient(self.host, self.user, self.password)
         self.preprocessor = TextPreprocessor()
+        self.db_session = init_db()
 
     def process_inbox(self):
         logging.info("Checking for new emails...")
@@ -70,7 +72,23 @@ class EmailDaemon:
             
             # Route
             self.client.route_email(uid, pred)
-            logging.info(f"Email UID {uid} -> Routing action completed.")
+            
+            action = class_map.get(pred, 'UNKNOWN')
+            logging.info(f"Email UID {uid} -> Routing action completed. Logged to DB.")
+            
+            # Persist to database
+            try:
+                log_entry = EmailLog(
+                    message_id=str(uid),
+                    sender=email['sender'],
+                    predicted_class=int(pred),
+                    action_taken=action
+                )
+                self.db_session.add(log_entry)
+                self.db_session.commit()
+            except Exception as e:
+                logging.error(f"Failed to save to database: {e}")
+                self.db_session.rollback()
 
 def execute_job():
     daemon = EmailDaemon()
