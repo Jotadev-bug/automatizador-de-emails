@@ -23,3 +23,7 @@ data/logs.db
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Google API OAuth2
+credentials.json
+token.json

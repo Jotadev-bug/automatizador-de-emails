@@ -11,16 +11,27 @@ def get_email_payload(msg):
     return ""
 
 class EmailClient:
-    def __init__(self, host, user, password):
+    def __init__(self, host, user, password=None, access_token=None):
         self.host = host
         self.user = user
         self.password = password
+        self.access_token = access_token
+        
+    def _login(self):
+        """Helper to establish the mailbox connection using either Password or OAuth2."""
+        mailbox = MailBox(self.host)
+        if self.access_token:
+            return mailbox.xoauth2(self.user, self.access_token)
+        elif self.password:
+            return mailbox.login(self.user, self.password)
+        else:
+            raise ValueError("Either password or access_token must be provided for authentication.")
 
     def fetch_unseen_emails(self):
         """Fetch emails that haven't been read yet."""
         emails = []
         try:
-            with MailBox(self.host).login(self.user, self.password) as mailbox:
+            with self._login() as mailbox:
                 # Target the INBOX folder and filter for UNSEEN
                 for msg in mailbox.fetch(A(seen=False)):
                     emails.append({
@@ -38,7 +49,7 @@ class EmailClient:
     def route_email(self, uid, predicted_class):
         """Moves or flags an email based on the model's predicted class."""
         try:
-            with MailBox(self.host).login(self.user, self.password) as mailbox:
+            with self._login() as mailbox:
                 if predicted_class == 0:
                     # Move to 1_INVOICES (Note: You must create this folder in your email provider)
                     mailbox.move(uid, '1_INVOICES')

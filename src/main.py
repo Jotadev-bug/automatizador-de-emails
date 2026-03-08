@@ -8,6 +8,7 @@ import joblib
 from email_client import EmailClient
 from preprocessing import TextPreprocessor
 from database import init_db, EmailLog
+from oauth_helper import get_oauth2_credentials, get_oauth2_string
 
 # Setup Logging
 logging.basicConfig(
@@ -29,9 +30,19 @@ class EmailDaemon:
         self.host = os.getenv('EMAIL_HOST')
         self.user = os.getenv('EMAIL_USER')
         self.password = os.getenv('EMAIL_PASS')
+        self.access_token = None
         
-        if not all([self.host, self.user, self.password]):
-            logging.error("IMAP credentials missing in .env")
+        # Check if OAuth2 should be used
+        creds = get_oauth2_credentials()
+        if creds and creds.valid:
+            logging.info("Using OAuth2 for Authentication")
+            self.access_token = get_oauth2_string(self.user, creds.token)
+        
+        if not self.host or not self.user:
+            logging.error("IMAP host or user missing in .env")
+            exit(1)
+        if not self.password and not self.access_token:
+            logging.error("Authentication method missing (No password and no valid OAuth2 token)")
             exit(1)
             
         logging.info("Loading ML Artifacts...")
@@ -42,7 +53,7 @@ class EmailDaemon:
             logging.error(f"Failed to load models: {e}. Did you run train_model.py?")
             exit(1)
             
-        self.client = EmailClient(self.host, self.user, self.password)
+        self.client = EmailClient(self.host, self.user, password=self.password, access_token=self.access_token)
         self.preprocessor = TextPreprocessor()
         self.db_session = init_db()
 
