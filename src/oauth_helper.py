@@ -1,9 +1,13 @@
 import os
 import json
 import logging
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
+try:
+    from google.oauth2.credentials import Credentials
+    from google_auth_oauthlib.flow import InstalledAppFlow
+    from google.auth.transport.requests import Request
+    GOOGLE_AUTH_AVAILABLE = True
+except ImportError:
+    GOOGLE_AUTH_AVAILABLE = False
 
 # Si modificas estos alcances (scopes), elimina el archivo token.json.
 SCOPES = ['https://mail.google.com/']
@@ -12,6 +16,10 @@ CREDENTIALS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'cre
 
 def get_oauth2_credentials():
     """Obtiene credenciales válidas del almacenamiento, o inicia el flujo OAuth2 para obtener unas nuevas."""
+    if not GOOGLE_AUTH_AVAILABLE:
+        logging.warning("Dependencias de Google OAuth2 no instaladas. Recurriendo a contraseña en .env.")
+        return None
+        
     creds = None
     # El archivo token.json guarda los tokens de acceso y refresco del usuario
     if os.path.exists(TOKEN_PATH):

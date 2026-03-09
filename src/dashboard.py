@@ -59,14 +59,14 @@ with col_chart1:
     class_counts = filtered_df['action_taken'].value_counts().reset_index()
     class_counts.columns = ['Action', 'Count']
     fig1 = px.pie(class_counts, values='Count', names='Action', title="Distribución de Acciones de Enrutamiento", hole=0.4)
-    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig1, width='stretch')
 
 with col_chart2:
     if not filtered_df.empty:
         # Group by date for a timeline
         timeline = filtered_df.groupby(filtered_df['timestamp'].dt.date).size().reset_index(name='Correos Procesados')
         fig2 = px.line(timeline, x='timestamp', y='Correos Procesados', title="Volumen de Procesamiento a lo Largo del Tiempo", markers=True)
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width='stretch')
 
 st.divider()
 
@@ -77,6 +77,6 @@ st.dataframe(
     filtered_df.sort_values(by='timestamp', ascending=False)
     .drop(columns=['id']) # Hide internal ID
     .style.map(lambda x: 'background-color: #d4edda;' if x == "INVOICE" else ('background-color: #f8d7da;' if x == "URGENT" else 'background-color: #e2e3e5;'), subset=['action_taken']),
-    use_container_width=True,
+    width='stretch',
     height=400
 )
