@@ -27,3 +27,7 @@ Thumbs.db
 # Google API OAuth2
 credentials.json
 token.json
+
+# Project Planning Files
+ROADMAP.md
+UPDATES.md
